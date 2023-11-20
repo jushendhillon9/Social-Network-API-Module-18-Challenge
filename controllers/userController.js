@@ -13,12 +13,10 @@ module.exports = {
     },
     async getUsersThoughtsAndFriends(req, res) {
         try {
-            const user = await User.findOne({_id: req.params.userId})
-                .populate([{path: "thoughts"}, {path: "friends"}])
+            const user = await User.findOne({ _id: req.params.userId }).populate('thoughts').populate(`friends`);
             res.json(user);
-        }
-        catch (err) {
-            console.error({message: err})
+        } catch (err) {
+            console.error({ message: err });
             res.status(500).json(err);
         }
     },
@@ -35,7 +33,7 @@ module.exports = {
     async updateUser(req, res) {
         try {
             const updatedUser = await User.findOneAndUpdate(
-                {_id: req.params.updatedID},
+                {_id: req.params.userId},
                 { 
                     $set: {
                         username: req.body.username,

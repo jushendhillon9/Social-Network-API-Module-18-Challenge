@@ -1,19 +1,45 @@
 const connection = require("../config/connection");
-const { User, Thought } = require("../models")
-const { usersData, thoughtsData } = require("./data")
+const { User, Thought } = require("../models");
+const { usersData, thoughtsData } = require("./data");
 
 connection.once("open", async () => {
-    let userCheck = await connection.db.listConnections({ name: "User"}).toArray();
-    if (userCheck.length === 1){
-        await connection.dropCollection("User")
-    }
+    try {
+        // Drop collections if they exist
+        await User.collection.drop();
+        await Thought.collection.drop();
 
-    let thoughtCheck = await connection.db.listConnections({name: "Thought"}).toArray();
-    if (thoughtCheck.length ===1) {
-        await connection.dropCollection("Thought");
-    }
+        // Create collections and add indexes using model methods
+        await User.createCollection();
+        await Thought.createCollection();
 
-    await User.collection.insertMany(usersData)
-    await Thought.collection.insertMany(thoughtsData);
-    process.exit(0);
-})
+        // Add unique index to the "username" field
+        await User.createIndexes();
+
+        // Insert data using Mongoose models
+        const insertedUsers = await User.insertMany(usersData);
+        const insertedThoughts = await Thought.insertMany(thoughtsData);
+
+        for (const thought of insertedThoughts) {
+            const matchingUser = insertedUsers.find((user) => user.username === thought.username);
+            if (matchingUser) {
+                matchingUser.thoughts.push(thought._id);
+                await matchingUser.save();
+            }
+        }
+
+        for (const needFriendsUser of insertedUsers) {
+            for (const friendlyUser of insertedUsers) {
+                if (friendlyUser.username != needFriendsUser.username) {
+                    needFriendsUser.friends.push(friendlyUser._id);
+                }
+            }
+            await needFriendsUser.save();
+        }
+
+
+        process.exit(0);
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+});

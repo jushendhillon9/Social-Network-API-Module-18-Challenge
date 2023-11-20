@@ -9,9 +9,9 @@ const {
 
 router.route("/")
     .get(getAllThought)
-    .get(getOneThought)
     .post(createThought)
-router.route("/:userId")
+router.route("/:thoughtId")
+    .get(getOneThought)
     .put(updateThought)
     .delete(deleteThought)
 

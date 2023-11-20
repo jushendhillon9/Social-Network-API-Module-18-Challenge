@@ -1,4 +1,4 @@
-const User = require("../models");
+const { User } = require("../models");
 
 module.exports = {
     async addFriend (req, res) {
@@ -7,7 +7,7 @@ module.exports = {
                 {_id: req.params.userId},
                 { $push: { friends: req.params.friendId } } //$push indicates I want to add addedID to friends array
             )
-            if (result.nModified === 1) {
+            if (result.modifiedCount === 1) {
                 res.json({message: "Friend successfully added"})
             }
             else {
@@ -22,10 +22,11 @@ module.exports = {
     async deleteFriend (req, res) {
         try {
             const deletedFriend = await User.updateOne(
-                {_id: req.body.userId},
-                { $pull: {friends: req.body.friendId}}
+                {_id: req.params.userId},
+                { $pull: {friends: req.params.friendId}}
             )
-            if (deletedFriend.nModified === 1) {
+            console.log(deletedFriend);
+            if (deletedFriend.modifiedCount === 1) {
                 res.json({message: "Friend successfully unadded"})
             }
             else {

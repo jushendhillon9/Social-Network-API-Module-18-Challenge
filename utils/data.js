@@ -93,7 +93,7 @@ const thoughtsData = [
     {
       thoughtText: "Learning a new language is exciting!",
       createdAt: new Date(),
-      username: "user4",
+      username: "user5",
       reactions: [
         {
           reactionBody: "I'm struggling with it.",

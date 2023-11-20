@@ -1,4 +1,4 @@
-const Thought = require("../models");
+const { Thought } = require("../models");
 
 module.exports = {
     async getAllThought (req, res) {
@@ -13,7 +13,7 @@ module.exports = {
     },
     async getOneThought (req, res) {
         try {
-            const thought = await Thought.findOne({_id: req.query.thoughtId})
+            const thought = await Thought.findOne({_id: req.params.thoughtId})
             res.json(thought);
         }
         catch (err) {
@@ -39,7 +39,7 @@ module.exports = {
     async updateThought (req, res) {
         try {
             const updatedThought = await Thought.findOneAndUpdate(
-                {_id: req.params.userId},
+                {_id: req.params.thoughtId},
                 {
                     $set: {
                         thoughtText: req.body.thoughtText,
@@ -57,7 +57,7 @@ module.exports = {
     async deleteThought (req, res) {
         try {
             const deletedThought = await Thought.findOneAndDelete(
-                {_id: req.params.userId},
+                {_id: req.params.thoughtId},
             )
             if (deletedThought) {
                 res.json(deletedThought)
